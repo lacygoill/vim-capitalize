@@ -1,9 +1,9 @@
-" ―――――――――――――――――――――――― tc_word_pattern"{{{
+" ―――――――――――――――――――――――― word_pattern "{{{
 
-" The goal of this section is to build the pattern `s:tc_word_pattern`
+" The goal of this section is to build the pattern `s:word_pattern`
 " matching all the words we want to capitalize.
 
-let s:tc_to_ignore = {'articles':     ['a', 'an', 'the'],
+let s:to_ignore = {'articles':     ['a', 'an', 'the'],
                     \
                     \ 'conjunctions': [
                                       \ 'after',
@@ -78,23 +78,23 @@ let s:tc_to_ignore = {'articles':     ['a', 'an', 'the'],
                     \ }
 
 " don't capitalize a word which contains an uppercase character
-let s:tc_word_pattern  = '\v%(\k*\u\k*)@!&'
+let s:word_pattern  = '\v%(\k*\u\k*)@!&'
 
 " don't capitalize a word just after an apostrophe
-let s:tc_word_pattern .= '''@<!&'
+let s:word_pattern .= '''@<!&'
 
 " don't capitalize roman numerals
-let s:tc_word_pattern .= '%([ivxlcdm]+>)@!&'
+let s:word_pattern .= '%([ivxlcdm]+>)@!&'
 
 " don't capitalize articles, conjunctions, and prepositions
 " http://www.grammar-monster.com/lessons/capital_letters_title_case.htm
 
-for s:tc_exception in s:tc_to_ignore.articles +
-                    \ s:tc_to_ignore.conjunctions +
-                    \ s:tc_to_ignore.prepositions
+for s:exception in s:to_ignore.articles +
+                    \ s:to_ignore.conjunctions +
+                    \ s:to_ignore.prepositions
 
-    " We don't want `s:tc_exception` to match at the same position than our word.
-    " For example, if `s:tc_exception` = `over`, then we need this concat:
+    " We don't want `s:exception` to match at the same position than our word.
+    " For example, if `s:exception` = `over`, then we need this concat:
     "
     "         %(over)@!.&
     "
@@ -119,22 +119,22 @@ for s:tc_exception in s:tc_to_ignore.articles +
     " We must get `&commentstring` inside the function.
     " So, for the moment, we use `C-a` as a place holder.
 
-    let s:tc_cms            = "\<C-a>"
-    let s:tc_concat_pattern = '%(%(\\n\\s*'.s:tc_cms.'?\\s*)@<=.|%(&>)@!)\&'
+    let s:cms            = "\<C-a>"
+    let s:concat_pattern = '%(%(\\n\\s*'.s:cms.'?\\s*)@<=.|%(&>)@!)\&'
 
-    let s:tc_word_pattern  .= substitute(s:tc_exception, '.*', s:tc_concat_pattern, '')
+    let s:word_pattern  .= substitute(s:exception, '.*', s:concat_pattern, '')
 endfor
 
-unlet! s:tc_to_ignore s:tc_exception s:tc_cms s:tc_concat_pattern
+unlet! s:to_ignore s:exception s:cms s:concat_pattern
 
 " don't capitalize a word followed or preceded by a dot
-let s:tc_word_pattern .= '\.@<!\k+>\.@!&'
+let s:word_pattern .= '\.@<!\k+>\.@!&'
 
 " FINAL concat of our regex, a word longer than 3 characters, without a dot
 " before or after.
 " Capture first letter, and the rest (separately).
 
-let s:tc_word_pattern .= '<(\k)(\k{3,})>'
+let s:word_pattern .= '<(\k)(\k{3,})>'
 
 " Garbage sentences to test the pattern:
 "
@@ -207,10 +207,10 @@ fu! s:reg_restore(names) abort
     endfor
 endfu
 
-fu! tc#op_titlecase(type, ...) abort
+fu! capitalize#op(type, ...) abort
 
     " The following dictionary stores the articles/conjunctions/prepositions
-    " which should not be titlecased. It misses some of them.
+    " which should not be capitalized. It misses some of them.
     " For more info, see:
     "
     "         https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
@@ -226,7 +226,7 @@ fu! tc#op_titlecase(type, ...) abort
     " If one day, we want to exlude them, we would have to add an entry in the
     " dictionary. They can't be mixed with single-word conjunctions.
     " Indeed, each conjunction will be used to produce a concat inside the
-    " regex used to match the words to titlecase.
+    " regex used to match the words to capitalize.
     " But the syntax for a concat which excludes a multi-part conjunction,
     " won't be the same as the concat which excludes a single-word conjunction.
 
@@ -237,21 +237,21 @@ fu! tc#op_titlecase(type, ...) abort
     call s:reg_save(['"', '+'])
 
     " Replace the placeholder (C-A) with the current commentstring.
-    let s:tc_word_pattern = substitute(s:tc_word_pattern, "\<C-A>",
+    let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
                                      \ matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
 
     if a:0
         norm! gvy
-        let titlecased = substitute(@", s:tc_word_pattern, upcase_replacement, 'g')
-        call setreg('"', titlecased, a:type ==? "\<C-v>" ? 'b' : '')
+        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
+        call setreg('"', capitalized, a:type ==? "\<C-v>" ? 'b' : '')
         norm! gv""p
 
     elseif a:type == 'line'
-        sil keepj keepp exe '''[,'']s/'.s:tc_word_pattern.'/'.upcase_replacement.'/ge'
+        sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
 
     else
         norm! `[v`]y
-        let titlecased = substitute(@", s:tc_word_pattern, upcase_replacement, 'g')
+        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
         norm! gv""p
 
     endif
