@@ -207,7 +207,7 @@ fu! s:reg_restore(names) abort
     endfor
 endfu
 
-fu! myfuncs#op_titlecase(type, ...) abort
+fu! tc#op_titlecase(type, ...) abort
 
     " The following dictionary stores the articles/conjunctions/prepositions
     " which should not be titlecased. It misses some of them.
