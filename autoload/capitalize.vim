@@ -1,4 +1,4 @@
-" ―――――――――――――――――――――――― word_pattern "{{{
+" word_pattern {{{1
 
 " The goal of this section is to build the pattern `s:word_pattern`
 " matching all the words we want to capitalize.
@@ -141,8 +141,7 @@ let s:word_pattern .= '<(\k)(\k{3,})>'
 "     hello world foo baZbaz xvi function.calls 'norf either
 "     over the quick brown fox jumps over the lazy dog
 
-"}}}
-" ―――――――――――――――――――――――― functions "{{{
+" functions {{{1
 
 let s:reg_translations = {
                          \ '"': 'unnamed',
@@ -165,7 +164,7 @@ fu! s:reg_restore(names) abort
         let contents = s:save_{suffix}[0]
         let type     = s:save_{suffix}[1]
 
-        " FIXME: how to restore `0` "{{{
+        " FIXME: how to restore `0` {{{
         "
         " When we restore use `setreg()` or `:let`, we can't make
         " a distinction between the unnamed and copy registers.
@@ -258,5 +257,3 @@ fu! capitalize#op(type, ...) abort
 
     call s:reg_restore(['"', '+'])
 endfu
-
-"}}}
