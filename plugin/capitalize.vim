@@ -7,5 +7,5 @@ nno <silent> cuu    :<C-U>set opfunc=capitalize#op<Bar>exe 'norm! '.v:count1.'g@
 " Can't use `cu` in visual mode because it would shadow the `c` operator.
 " Use `Zu` instead. Mnemonic: viZual?
 
-xno <silent> Zu     :<C-U>call capitalize#op(visualmode(), 1)<CR>
-xno <silent> Zu     :<C-U>call capitalize#op(visualmode(), 1)<CR>
+xno <silent> Zu     :<C-U>call capitalize#op(visualmode())<CR>
+xno <silent> Zu     :<C-U>call capitalize#op(visualmode())<CR>

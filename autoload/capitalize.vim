@@ -1,4 +1,122 @@
-" word_pattern {{{1
+" functions {{{1
+fu! capitalize#op(type) abort "{{{2
+
+    " The following dictionary stores the articles/conjunctions/prepositions
+    " which should not be capitalized. It misses some of them.
+    " For more info, see:
+    "
+    "         https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
+    "         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Correlative_conjunctions
+    "         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Subordinating_conjunctions
+    "
+    "
+    " Correlative and subordinating conjunctions can be in several parts.
+    " Eg:
+    "         no sooner than
+    "         as far as
+    "
+    " If one day, we want to exlude them, we would have to add an entry in the
+    " dictionary. They can't be mixed with single-word conjunctions.
+    " Indeed, each conjunction will be used to produce a concat inside the
+    " regex used to match the words to capitalize.
+    " But the syntax for a concat which excludes a multi-part conjunction,
+    " won't be the same as the concat which excludes a single-word conjunction.
+
+    " \1 matches the first letter of a word.
+    " \2 matches the rest of a word.
+
+    let upcase_replacement   = '\u\1\L\2'
+    call s:reg_save(['"', '+'])
+
+    " Replace the placeholder (C-A) with the current commentstring.
+    let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
+                                     \ matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
+
+    if count([ 'v', 'V', "\<c-v>" ], a:type)
+        norm! gvy
+        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
+        call setreg('"', capitalized, a:type ==? "\<C-v>" ? 'b' : '')
+        norm! gv""p
+
+    elseif a:type == 'line'
+        sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
+
+    else
+        norm! `[v`]y
+        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
+        norm! gv""p
+
+    endif
+
+    call s:reg_restore(['"', '+'])
+endfu
+fu! s:reg_restore(names) abort "{{{2
+    for name in a:names
+        let suffix   = get(s:reg_translations, name, name)
+        let contents = s:save_{suffix}[0]
+        let type     = s:save_{suffix}[1]
+
+        " FIXME: how to restore `0` {{{
+        "
+        " When we restore use `setreg()` or `:let`, we can't make
+        " a distinction between the unnamed and copy registers.
+        " IOW, whatever we do to one of them, we do it to the other.
+        "
+        " Why are they synchronized with `setreg()` and `:let`?
+        " They aren't in normal mode. If I copy some text, they will be
+        " identical. But if I delete some other text just afterwards, they
+        " will be different.
+        "
+        " I could understand the synchronization in one direction:
+        "
+        "     change @0    →    change @"
+        "
+        " … because one could argue that the unnamed register points to the
+        " last changed register. So, when we change the contents of the copy
+        " register, the unnamed points to the latter. OK, why not.
+        " But I can't understand in the other direction:
+        "
+        "     change @"    →    change @0
+        "
+        " If I execute:
+        "
+        "     :call setreg('"', 'unnamed')
+        "
+        " … why does the copy register receives the same contents?
+        "
+        " This cause a problem for all functions (operators) which need to
+        " temporarily copy some text, want to restore the unnamed register
+        " as well as the copy register to whatever old values they had, and
+        " those 2 registers are different at the time the function was
+        " invoked.
+        "
+        " That's why, at the moment, I don't try to restore the copy register
+        " in ANY operator function. I simply CAN'T.
+"}}}
+
+        call setreg(name, contents, type)
+    endfor
+endfu
+
+fu! s:reg_save(names) abort "{{{2
+    for name in a:names
+        let suffix          = get(s:reg_translations, name, name)
+        let s:save_{suffix} = [getreg(name), getregtype(name)]
+    endfor
+endfu
+
+" variables {{{1
+" reg_translations {{{2
+
+let s:reg_translations = {
+                         \ '"': 'unnamed',
+                         \ '+': 'plus',
+                         \ '-': 'minus',
+                         \ '*': 'star',
+                         \ '/': 'slash',
+                         \ }
+
+" word_pattern {{{2
 
 " The goal of this section is to build the pattern `s:word_pattern`
 " matching all the words we want to capitalize.
@@ -140,120 +258,3 @@ let s:word_pattern .= '<(\k)(\k{3,})>'
 "
 "     hello world foo baZbaz xvi function.calls 'norf either
 "     over the quick brown fox jumps over the lazy dog
-
-" functions {{{1
-
-let s:reg_translations = {
-                         \ '"': 'unnamed',
-                         \ '+': 'plus',
-                         \ '-': 'minus',
-                         \ '*': 'star',
-                         \ '/': 'slash',
-                         \ }
-
-fu! s:reg_save(names) abort
-    for name in a:names
-        let suffix          = get(s:reg_translations, name, name)
-        let s:save_{suffix} = [getreg(name), getregtype(name)]
-    endfor
-endfu
-
-fu! s:reg_restore(names) abort
-    for name in a:names
-        let suffix   = get(s:reg_translations, name, name)
-        let contents = s:save_{suffix}[0]
-        let type     = s:save_{suffix}[1]
-
-        " FIXME: how to restore `0` {{{
-        "
-        " When we restore use `setreg()` or `:let`, we can't make
-        " a distinction between the unnamed and copy registers.
-        " IOW, whatever we do to one of them, we do it to the other.
-        "
-        " Why are they synchronized with `setreg()` and `:let`?
-        " They aren't in normal mode. If I copy some text, they will be
-        " identical. But if I delete some other text just afterwards, they
-        " will be different.
-        "
-        " I could understand the synchronization in one direction:
-        "
-        "     change @0    →    change @"
-        "
-        " … because one could argue that the unnamed register points to the
-        " last changed register. So, when we change the contents of the copy
-        " register, the unnamed points to the latter. OK, why not.
-        " But I can't understand in the other direction:
-        "
-        "     change @"    →    change @0
-        "
-        " If I execute:
-        "
-        "     :call setreg('"', 'unnamed')
-        "
-        " … why does the copy register receives the same contents?
-        "
-        " This cause a problem for all functions (operators) which need to
-        " temporarily copy some text, want to restore the unnamed register
-        " as well as the copy register to whatever old values they had, and
-        " those 2 registers are different at the time the function was
-        " invoked.
-        "
-        " That's why, at the moment, I don't try to restore the copy register
-        " in ANY operator function. I simply CAN'T.
-"}}}
-
-        call setreg(name, contents, type)
-    endfor
-endfu
-
-fu! capitalize#op(type, ...) abort
-
-    " The following dictionary stores the articles/conjunctions/prepositions
-    " which should not be capitalized. It misses some of them.
-    " For more info, see:
-    "
-    "         https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
-    "         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Correlative_conjunctions
-    "         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Subordinating_conjunctions
-    "
-    "
-    " Correlative and subordinating conjunctions can be in several parts.
-    " Eg:
-    "         no sooner than
-    "         as far as
-    "
-    " If one day, we want to exlude them, we would have to add an entry in the
-    " dictionary. They can't be mixed with single-word conjunctions.
-    " Indeed, each conjunction will be used to produce a concat inside the
-    " regex used to match the words to capitalize.
-    " But the syntax for a concat which excludes a multi-part conjunction,
-    " won't be the same as the concat which excludes a single-word conjunction.
-
-    " \1 matches the first letter of a word.
-    " \2 matches the rest of a word.
-
-    let upcase_replacement   = '\u\1\L\2'
-    call s:reg_save(['"', '+'])
-
-    " Replace the placeholder (C-A) with the current commentstring.
-    let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
-                                     \ matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
-
-    if a:0
-        norm! gvy
-        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
-        call setreg('"', capitalized, a:type ==? "\<C-v>" ? 'b' : '')
-        norm! gv""p
-
-    elseif a:type == 'line'
-        sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
-
-    else
-        norm! `[v`]y
-        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
-        norm! gv""p
-
-    endif
-
-    call s:reg_restore(['"', '+'])
-endfu
