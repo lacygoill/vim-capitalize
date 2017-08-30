@@ -1,5 +1,12 @@
+" guard {{{1
+
+if exists('g:auto_loaded_titlecase')
+    finish
+endif
+let g:auto_loaded_titlecase = 1
+
 " functions {{{1
-fu! capitalize#op(type) abort "{{{2
+fu! titlecase#op(type) abort "{{{2
 
     " The following dictionary stores the articles/conjunctions/prepositions
     " which should not be capitalized. It misses some of them.
@@ -34,8 +41,8 @@ fu! capitalize#op(type) abort "{{{2
 
     if count([ 'v', 'V', "\<c-v>" ], a:type)
         norm! gvy
-        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
-        call setreg('"', capitalized, a:type ==? "\<C-v>" ? 'b' : '')
+        let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
+        call setreg('"', titlecased, a:type ==? "\<C-v>" ? 'b' : '')
         norm! gv""p
 
     elseif a:type == 'line'
@@ -43,7 +50,7 @@ fu! capitalize#op(type) abort "{{{2
 
     else
         norm! `[v`]y
-        let capitalized = substitute(@", s:word_pattern, upcase_replacement, 'g')
+        let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
         norm! gv""p
 
     endif
