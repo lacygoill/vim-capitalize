@@ -39,7 +39,7 @@ fu! titlecase#op(type) abort "{{{2
     let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
                                      \ matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
 
-    if count([ 'v', 'V', "\<c-v>" ], a:type)
+    if index([ 'v', 'V', "\<c-v>" ], a:type) != -1
         norm! gvy
         let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
         call setreg('"', titlecased, a:type ==? "\<C-v>" ? 'b' : '')
