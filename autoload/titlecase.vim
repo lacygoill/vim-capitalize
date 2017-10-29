@@ -33,7 +33,7 @@ fu! titlecase#op(type) abort "{{{2
     " \2 matches the rest of a word.
 
     let upcase_replacement   = '\u\1\L\2'
-    call s:reg_save(['"', '+'])
+    call my_lib#reg_save(['"', '+'])
 
     " Replace the placeholder (C-A) with the current commentstring.
     let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
@@ -55,36 +55,10 @@ fu! titlecase#op(type) abort "{{{2
 
     endif
 
-    call s:reg_restore(['"', '+'])
-endfu
-fu! s:reg_restore(names) abort "{{{2
-    for name in a:names
-        let prefix   = get(s:reg_translations, name, name)
-        let contents = s:{prefix}_save[0]
-        let type     = s:{prefix}_save[1]
-
-        call setreg(name, contents, type)
-    endfor
-endfu
-
-fu! s:reg_save(names) abort "{{{2
-    for name in a:names
-        let prefix          = get(s:reg_translations, name, name)
-        let s:{prefix}_save = [getreg(name), getregtype(name)]
-    endfor
+    call my_lib#reg_restore(['"', '+'])
 endfu
 
 " variables {{{1
-" reg_translations {{{2
-
-let s:reg_translations = {
-                         \ '"': 'unnamed',
-                         \ '+': 'plus',
-                         \ '-': 'minus',
-                         \ '*': 'star',
-                         \ '/': 'slash',
-                         \ }
-
 " word_pattern {{{2
 
 " The goal of this section is to build the pattern `s:word_pattern`
