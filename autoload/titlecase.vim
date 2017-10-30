@@ -8,30 +8,9 @@ let g:auto_loaded_titlecase = 1
 " functions {{{1
 fu! titlecase#op(type) abort "{{{2
 
-    " The following dictionary stores the articles/conjunctions/prepositions
-    " which should not be capitalized. It misses some of them.
-    " For more info, see:
-    "
-    "         https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
-    "         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Correlative_conjunctions
-    "         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Subordinating_conjunctions
-    "
-    "
-    " Correlative and subordinating conjunctions can be in several parts.
-    " Eg:
-    "         no sooner than
-    "         as far as
-    "
-    " If one day, we want to exlude them, we would have to add an entry in the
-    " dictionary. They can't be mixed with single-word conjunctions.
-    " Indeed, each conjunction will be used to produce a concat inside the
-    " regex used to match the words to capitalize.
-    " But the syntax for a concat which excludes a multi-part conjunction,
-    " won't be the same as the concat which excludes a single-word conjunction.
-
-    " \1 matches the first letter of a word.
-    " \2 matches the rest of a word.
-
+    "                              ┌─ first letter of a word
+    "                              │   ┌─ rest of a word
+    "                              │   │
     let upcase_replacement   = '\u\1\L\2'
     call my_lib#reg_save(['"', '+'])
 
@@ -61,8 +40,30 @@ endfu
 " variables {{{1
 " word_pattern {{{2
 
-" The goal of this section is to build the pattern `s:word_pattern`
-" matching all the words we want to capitalize.
+" Goal:
+" build the pattern `s:word_pattern` matching all the words we want to capitalize.
+
+
+" The following dictionary stores the articles/conjunctions/prepositions
+" which should not be capitalized. It misses some of them.
+" For more info, see:
+"
+"         https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
+"         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Correlative_conjunctions
+"         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Subordinating_conjunctions
+"
+"
+" Correlative and subordinating conjunctions can be in several parts.
+" Eg:
+"         no sooner than
+"         as far as
+"
+" If one day, we want to exlude them, we would have to add an entry in the
+" dictionary. They can't be mixed with single-word conjunctions.
+" Indeed, each conjunction will be used to produce a concat inside the
+" regex used to match the words to capitalize.
+" But the syntax for a concat which excludes a multi-part conjunction,
+" won't be the same as the concat which excludes a single-word conjunction.
 
 let s:to_ignore = {'articles':     ['a', 'an', 'the'],
                     \
