@@ -40,7 +40,7 @@ fu! titlecase#op(type) abort "{{{2
                                      \ matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
 
     if index([ 'v', 'V', "\<c-v>" ], a:type) != -1
-        norm! gvy
+        sil norm! gvy
         let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
         call setreg('"', titlecased, a:type ==? "\<C-v>" ? 'b' : '')
         norm! gv""p
@@ -49,7 +49,7 @@ fu! titlecase#op(type) abort "{{{2
         sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
 
     else
-        norm! `[v`]y
+        sil norm! `[v`]y
         let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
         norm! gv""p
 
