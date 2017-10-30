@@ -15,17 +15,17 @@ fu! titlecase#op(type) abort "{{{2
         set cb-=unnamed cb-=unnamedplus
         set selection=inclusive
 
-        " Replace the placeholder (C-A) with the current commentstring.
-        let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
-        \                               matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
+        " Replace the placeholder (C-a) with the current commentstring.
+        let s:pat = substitute(s:pat, "\<c-a>",
+        \                      matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
 
-        "                              ┌─ first letter of a word
-        "                              │   ┌─ rest of a word
-        "                              │   │
-        let upcase_replacement   = '\u\1\L\2'
+        "             ┌─ first letter of a word
+        "             │   ┌─ rest of a word
+        "             │   │
+        let rep = '\u\1\L\2'
 
         if a:type == 'line'
-            sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
+            sil keepj keepp exe '''[,'']s/'.s:pat.'/'.rep.'/ge'
         else
             if index([ 'v', 'V', "\<c-v>" ], a:type) != -1
                 sil norm! gvy
@@ -40,8 +40,8 @@ fu! titlecase#op(type) abort "{{{2
                 sil exe "norm! `[\<c-v>`]y"
                 exe "norm! `[\<c-v>`]"
             endif
-            let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
-            call setreg('"', titlecased, a:type ==# "\<c-v>" || a:type ==# 'block' ? 'b' : '')
+            let new_text = substitute(@", s:pat, rep, 'g')
+            call setreg('"', new_text, a:type ==# "\<c-v>" || a:type ==# 'block' ? 'b' : '')
             norm! p
         endif
 
@@ -56,10 +56,10 @@ fu! titlecase#op(type) abort "{{{2
 endfu
 
 " variables {{{1
-" word_pattern {{{2
+" pat {{{2
 
 " Goal:
-" build the pattern `s:word_pattern` matching all the words we want to capitalize.
+" build the pattern `s:pat` matching all the words we want to capitalize.
 
 
 " The following dictionary stores the articles/conjunctions/prepositions
@@ -158,13 +158,13 @@ let s:to_ignore = {'articles':     ['a', 'an', 'the'],
                     \ }
 
 " don't capitalize a word which contains an uppercase character
-let s:word_pattern  = '\v%(\k*\u\k*)@!&'
+let s:pat = '\v%(\k*\u\k*)@!&'
 
 " don't capitalize a word just after an apostrophe
-let s:word_pattern .= '''@<!&'
+let s:pat .= '''@<!&'
 
 " don't capitalize roman numerals
-let s:word_pattern .= '%([ivxlcdm]+>)@!&'
+let s:pat .= '%([ivxlcdm]+>)@!&'
 
 " don't capitalize articles, conjunctions, and prepositions
 " http://www.grammar-monster.com/lessons/capital_letters_title_case.htm
@@ -202,19 +202,19 @@ for s:exception in s:to_ignore.articles +
     let s:cms            = "\<C-a>"
     let s:concat_pattern = '%(%(\\n\\s*'.s:cms.'?\\s*)@<=.|%(&>)@!)\&'
 
-    let s:word_pattern  .= substitute(s:exception, '.*', s:concat_pattern, '')
+    let s:pat .= substitute(s:exception, '.*', s:concat_pattern, '')
 endfor
 
 unlet! s:to_ignore s:exception s:cms s:concat_pattern
 
 " don't capitalize a word followed or preceded by a dot
-let s:word_pattern .= '\.@<!\k+>\.@!&'
+let s:pat .= '\.@<!\k+>\.@!&'
 
 " FINAL concat of our regex, a word longer than 3 characters, without a dot
 " before or after.
 " Capture first letter, and the rest (separately).
 
-let s:word_pattern .= '<(\k)(\k{3,})>'
+let s:pat .= '<(\k)(\k{3,})>'
 
 " Garbage sentences to test the pattern:
 "
