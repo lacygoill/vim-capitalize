@@ -8,5 +8,5 @@ let g:loaded_titlecase = 1
 nno <silent> crt     :<C-U>set opfunc=titlecase#op<CR>g@
 nno <silent> crtt    :<C-U>set opfunc=titlecase#op<Bar>exe 'norm! '.v:count1.'g@_'<CR>
 
-xno <silent> mrt     :<C-U>call titlecase#op(visualmode())<CR>
-xno <silent> mrt     :<C-U>call titlecase#op(visualmode())<CR>
+xno <silent> mrt     :<C-U>exe titlecase#op(visualmode())<CR>
+xno <silent> mrt     :<C-U>exe titlecase#op(visualmode())<CR>

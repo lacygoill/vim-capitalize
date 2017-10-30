@@ -7,34 +7,52 @@ let g:auto_loaded_titlecase = 1
 
 " functions {{{1
 fu! titlecase#op(type) abort "{{{2
+    let cb_save  = &cb
+    let sel_save = &selection
+    let reg_save = [ getreg('"'), getregtype('"') ]
 
-    "                              ┌─ first letter of a word
-    "                              │   ┌─ rest of a word
-    "                              │   │
-    let upcase_replacement   = '\u\1\L\2'
-    call my_lib#reg_save(['"', '+'])
+    try
+        set cb-=unnamed cb-=unnamedplus
+        set selection=inclusive
 
-    " Replace the placeholder (C-A) with the current commentstring.
-    let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
-                                     \ matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
+        " Replace the placeholder (C-A) with the current commentstring.
+        let s:word_pattern = substitute(s:word_pattern, "\<C-A>",
+        \                               matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
 
-    if index([ 'v', 'V', "\<c-v>" ], a:type) != -1
-        sil norm! gvy
-        let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
-        call setreg('"', titlecased, a:type ==? "\<C-v>" ? 'b' : '')
-        norm! gv""p
+        "                              ┌─ first letter of a word
+        "                              │   ┌─ rest of a word
+        "                              │   │
+        let upcase_replacement   = '\u\1\L\2'
 
-    elseif a:type == 'line'
-        sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
+        if a:type == 'line'
+            sil keepj keepp exe '''[,'']s/'.s:word_pattern.'/'.upcase_replacement.'/ge'
+        else
+            if index([ 'v', 'V', "\<c-v>" ], a:type) != -1
+                sil norm! gvy
+                norm! gv
+            elseif a:type ==# 'char'
+                sil norm! `[v`]y
+                norm! `[v`]
+            elseif a:type ==# 'line'
+                sil norm! '[V']y
+                norm! '[V']
+            elseif a:type ==# 'block'
+                sil exe "norm! `[\<c-v>`]y"
+                exe "norm! `[\<c-v>`]"
+            endif
+            let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
+            call setreg('"', titlecased, a:type ==# "\<c-v>" || a:type ==# 'block' ? 'b' : '')
+            norm! p
+        endif
 
-    else
-        sil norm! `[v`]y
-        let titlecased = substitute(@", s:word_pattern, upcase_replacement, 'g')
-        norm! gv""p
-
-    endif
-
-    call my_lib#reg_restore(['"', '+'])
+    catch
+        return 'echoerr '.string(v:exception)
+    finally
+        let &cb  = cb_save
+        let &sel = sel_save
+        call setreg('"', reg_save[0], reg_save[1])
+    endtry
+    return ''
 endfu
 
 " variables {{{1
