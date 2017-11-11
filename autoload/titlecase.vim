@@ -199,13 +199,13 @@ for s:exception in s:to_ignore.articles +
     " We must get `&commentstring` inside the function.
     " So, for the moment, we use `C-a` as a place holder.
 
-    let s:cms            = "\<C-a>"
-    let s:concat_pattern = '%(%(\\n\\s*'.s:cms.'?\\s*)@<=.|%(&>)@!)\&'
+    let s:cml            = "\<C-a>"
+    let s:concat_pattern = '%(%(\\n\\s*'.s:cml.'?\\s*)@<=.|%(&>)@!)\&'
 
     let s:pat .= substitute(s:exception, '.*', s:concat_pattern, '')
 endfor
 
-unlet! s:to_ignore s:exception s:cms s:concat_pattern
+unlet! s:to_ignore s:exception s:cml s:concat_pattern
 
 " don't capitalize a word followed or preceded by a dot
 let s:pat .= '\.@<!\k+>\.@!&'
