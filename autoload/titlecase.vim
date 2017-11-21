@@ -27,7 +27,7 @@ fu! titlecase#op(type) abort "{{{2
         if a:type == 'line'
             sil keepj keepp exe '''[,'']s/'.s:pat.'/'.rep.'/ge'
         else
-            if index([ 'v', 'V', "\<c-v>" ], a:type) >= 0
+            if a:type ==# 'vis'
                 sil norm! gvy
                 norm! gv
             elseif a:type ==# 'char'
