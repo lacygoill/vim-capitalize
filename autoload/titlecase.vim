@@ -1,7 +1,7 @@
-if exists('g:auto_loaded_titlecase')
+if exists('g:autoloaded_titlecase')
     finish
 endif
-let g:auto_loaded_titlecase = 1
+let g:autoloaded_titlecase = 1
 
 " functions {{{1
 fu! titlecase#op(type) abort "{{{2
