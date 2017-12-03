@@ -12,5 +12,6 @@ let g:loaded_titlecase = 1
 nno <silent> crt     :<C-U>set opfunc=titlecase#op<CR>g@
 nno <silent> crtt    :<C-U>set opfunc=titlecase#op<Bar>exe 'norm! '.v:count1.'g@_'<CR>
 
+" We use `m-u c` to stay consistent with how `vim-readline` capitalizes a word.
 xno <silent> <m-u>c     :<C-U>exe titlecase#op('vis')<CR>
 xno <silent> <m-u>c     :<C-U>exe titlecase#op('vis')<CR>
