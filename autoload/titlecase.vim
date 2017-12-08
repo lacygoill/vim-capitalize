@@ -44,13 +44,12 @@ fu! titlecase#op(type) abort "{{{2
         endif
 
     catch
-        return 'echoerr '.string(v:exception)
+        call my_lib#catch_error()
     finally
         let &cb  = cb_save
         let &sel = sel_save
         call setreg('"', reg_save[0], reg_save[1])
     endtry
-    return ''
 endfu
 
 " variables {{{1
