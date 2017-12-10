@@ -1,8 +1,3 @@
-if exists('g:autoloaded_titlecase')
-    finish
-endif
-let g:autoloaded_titlecase = 1
-
 " functions {{{1
 fu! titlecase#op(type) abort "{{{2
     let cb_save  = &cb
