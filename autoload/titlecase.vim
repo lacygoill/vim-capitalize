@@ -39,7 +39,7 @@ fu! titlecase#op(type) abort "{{{2
         endif
 
     catch
-        return my_lib#catch_error()
+        return lg#catch_error()
     finally
         let &cb  = cb_save
         let &sel = sel_save
