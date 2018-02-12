@@ -22,24 +22,24 @@ fu! titlecase#op(type) abort "{{{2
         "             │   │
         let rep = '\u\1\L\2'
 
-        if a:type == 'line'
+        if a:type is# 'line'
             sil keepj keepp exe '''[,'']s/'.s:pat.'/'.rep.'/ge'
         else
-            if a:type ==# 'vis'
+            if a:type is# 'vis'
                 sil norm! gvy
                 norm! gv
-            elseif a:type ==# 'char'
+            elseif a:type is# 'char'
                 sil norm! `[v`]y
                 norm! `[v`]
-            elseif a:type ==# 'line'
+            elseif a:type is# 'line'
                 sil norm! '[V']y
                 norm! '[V']
-            elseif a:type ==# 'block'
+            elseif a:type is# 'block'
                 sil exe "norm! `[\<c-v>`]y"
                 exe "norm! `[\<c-v>`]"
             endif
             let new_text = substitute(@", s:pat, rep, 'g')
-            call setreg('"', new_text, a:type ==# "\<c-v>" || a:type ==# 'block' ? 'b' : '')
+            call setreg('"', new_text, a:type is# "\<c-v>" || a:type is# 'block' ? 'b' : '')
             norm! p
         endif
 
