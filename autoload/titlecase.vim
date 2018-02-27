@@ -80,7 +80,7 @@ endfu
 " But the syntax for a concat which excludes a multi-part conjunction,
 " won't be the same as the concat which excludes a single-word conjunction.
 
-let s:to_ignore = {'articles':     ['a', 'an', 'the'],
+let s:TO_IGNORE = {'articles':     ['a', 'an', 'the'],
                     \
                     \ 'conjunctions': [
                                       \ 'after',
@@ -166,9 +166,9 @@ let s:pat .= '%([ivxlcdm]+>)@!&'
 " don't capitalize articles, conjunctions, and prepositions
 " http://www.grammar-monster.com/lessons/capital_letters_title_case.htm
 
-for s:exception in s:to_ignore.articles +
-                    \ s:to_ignore.conjunctions +
-                    \ s:to_ignore.prepositions
+for s:exception in s:TO_IGNORE.articles +
+                    \ s:TO_IGNORE.conjunctions +
+                    \ s:TO_IGNORE.prepositions
 
     " We don't want `s:exception` to match at the same position than our word.
     " For example, if `s:exception` = `over`, then we need this concat:
@@ -196,13 +196,13 @@ for s:exception in s:to_ignore.articles +
     " We must get `&commentstring` inside the function.
     " So, for the moment, we use `C-a` as a place holder.
 
-    let s:cml            = "\<C-a>"
-    let s:concat_pattern = '%(%(\\n\\s*'.s:cml.'?\\s*)@<=.|%(&>)@!)\&'
+    let s:CML        = "\<C-a>"
+    let s:CONCAT_PAT = '%(%(\\n\\s*'.s:CML.'?\\s*)@<=.|%(&>)@!)\&'
 
-    let s:pat .= substitute(s:exception, '.*', s:concat_pattern, '')
+    let s:pat .= substitute(s:exception, '.*', s:CONCAT_PAT, '')
 endfor
 
-unlet! s:to_ignore s:exception s:cml s:concat_pattern
+unlet! s:TO_IGNORE s:exception s:CML s:CONCAT_PAT
 
 " don't capitalize a word followed or preceded by a dot
 let s:pat .= '\.@<!\k+>\.@!&'
