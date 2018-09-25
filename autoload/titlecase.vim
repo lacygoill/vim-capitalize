@@ -7,7 +7,7 @@ let g:autoloaded_titlecase = 1
 fu! titlecase#op(type) abort "{{{2
     let cb_save  = &cb
     let sel_save = &selection
-    let reg_save = [ '"', getreg('"'), getregtype('"') ]
+    let reg_save = ['"', getreg('"'), getregtype('"')]
 
     try
         set cb-=unnamed cb-=unnamedplus
