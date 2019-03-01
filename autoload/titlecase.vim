@@ -14,8 +14,8 @@ fu! titlecase#op(type) abort "{{{2
         set selection=inclusive
 
         " Replace the placeholder (C-a) with the current commentstring.
-        let s:pat = substitute(s:pat, "\<c-a>",
-        \                      matchstr(&commentstring, '^\S\+\ze\s*%s'), 'g')
+        let pat = substitute(s:pat, "\<c-a>",
+            \ matchstr(&cms, '^\S\+\ze\s*%s').(empty(&cms) ? '' : '='), 'g')
 
         "             ┌─ first letter of a word
         "             │   ┌─ rest of a word
@@ -23,7 +23,7 @@ fu! titlecase#op(type) abort "{{{2
         let rep = '\u\1\L\2'
 
         if a:type is# 'line'
-            sil keepj keepp exe '''[,'']s/'.s:pat.'/'.rep.'/ge'
+            sil keepj keepp exe '''[,'']s/'.pat.'/'.rep.'/ge'
         else
             if a:type is# 'vis'
                 sil norm! gvy
@@ -38,7 +38,7 @@ fu! titlecase#op(type) abort "{{{2
                 sil exe "norm! `[\<c-v>`]y"
                 exe "norm! `[\<c-v>`]"
             endif
-            let new_text = substitute(@", s:pat, rep, 'g')
+            let new_text = substitute(@", pat, rep, 'g')
             call setreg('"', new_text, a:type is# "\<c-v>" || a:type is# 'block' ? 'b' : '')
             norm! p
         endif
@@ -195,7 +195,7 @@ for s:exception in s:TO_IGNORE.articles +
     " So, for the moment, we use `C-a` as a place holder.
 
     let s:CML        = "\<C-a>"
-    let s:CONCAT_PAT = '%(%(\\n\\s*'.s:CML.'?\\s*)@<=.|%(&>)@!)\&'
+    let s:CONCAT_PAT = '%(%(\\n\\s*'.s:CML.'\\s*)@<=.|%(&>)@!)\&'
 
     let s:pat .= substitute(s:exception, '.*', s:CONCAT_PAT, '')
 endfor
