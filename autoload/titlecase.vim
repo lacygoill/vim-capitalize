@@ -17,8 +17,8 @@ fu! titlecase#op(type) abort "{{{2
         let pat = substitute(s:pat, "\<c-a>",
             \ matchstr(&cms, '^\S\+\ze\s*%s').(empty(&cms) ? '' : '='), 'g')
 
-        "             ┌─ first letter of a word
-        "             │   ┌─ rest of a word
+        "             ┌ first letter of a word
+        "             │   ┌ rest of a word
         "             │   │
         let rep = '\u\1\L\2'
 
