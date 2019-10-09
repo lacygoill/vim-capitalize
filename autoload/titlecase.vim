@@ -156,10 +156,10 @@ let s:TO_IGNORE = {'articles': ['a', 'an', 'the'],
 let s:pat = '\v%(\k*\u\k*)@!&'
 
 " don't capitalize a word just after an apostrophe
-let s:pat .= '''@<!&'
+let s:pat ..= '''@<!&'
 
 " don't capitalize roman numerals
-let s:pat .= '%([ivxlcdm]+>)@!&'
+let s:pat ..= '%([ivxlcdm]+>)@!&'
 
 " don't capitalize articles, conjunctions, and prepositions
 " http://www.grammar-monster.com/lessons/capital_letters_title_case.htm
@@ -197,19 +197,19 @@ for s:exception in s:TO_IGNORE.articles +
     let s:CML        = "\<C-a>"
     let s:CONCAT_PAT = '%(%(\\n\\s*'.s:CML.'\\s*)@<=.|%(&>)@!)\&'
 
-    let s:pat .= substitute(s:exception, '.*', s:CONCAT_PAT, '')
+    let s:pat ..= substitute(s:exception, '.*', s:CONCAT_PAT, '')
 endfor
 
 unlet! s:TO_IGNORE s:exception s:CML s:CONCAT_PAT
 
 " don't capitalize a word followed or preceded by a dot
-let s:pat .= '\.@<!\k+>\.@!&'
+let s:pat ..= '\.@<!\k+>\.@!&'
 
 " FINAL concat of our regex, a word longer than 3 characters, without a dot
 " before or after.
 " Capture first letter, and the rest (separately).
 
-let s:pat .= '<(\k)(\k{3,})>'
+let s:pat ..= '<(\k)(\k{3,})>'
 
 " Garbage sentences to test the pattern:
 "
