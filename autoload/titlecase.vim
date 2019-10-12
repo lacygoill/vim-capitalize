@@ -4,7 +4,7 @@ endif
 let g:autoloaded_titlecase = 1
 
 " functions {{{1
-fu! titlecase#op(type) abort "{{{2
+fu titlecase#op(type) abort "{{{2
     let cb_save  = &cb
     let sel_save = &selection
     let reg_save = ['"', getreg('"'), getregtype('"')]
@@ -63,9 +63,9 @@ endfu
 " which should not be capitalized. It misses some of them.
 " For more info, see:
 "
-"         https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
-"         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Correlative_conjunctions
-"         https://en.wikipedia.org/wiki/Conjunction_(grammar)#Subordinating_conjunctions
+" https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
+" https://en.wikipedia.org/wiki/Conjunction_(grammar)#Correlative_conjunctions
+" https://en.wikipedia.org/wiki/Conjunction_(grammar)#Subordinating_conjunctions
 "
 "
 " Correlative and subordinating conjunctions can be in several parts.
@@ -80,7 +80,7 @@ endfu
 " But the syntax for a concat which excludes a multi-part conjunction,
 " won't be the same as the concat which excludes a single-word conjunction.
 
-let s:TO_IGNORE = {'articles': ['a', 'an', 'the'],
+const s:TO_IGNORE = {'articles': ['a', 'an', 'the'],
     \ 'conjunctions': [
     \     'after',
     \     'although',
@@ -194,13 +194,13 @@ for s:exception in s:TO_IGNORE.articles +
     " We must get `&commentstring` inside the function.
     " So, for the moment, we use `C-a` as a place holder.
 
-    let s:CML        = "\<C-a>"
-    let s:CONCAT_PAT = '%(%(\\n\\s*'.s:CML.'\\s*)@<=.|%(&>)@!)\&'
+    let s:cml        = "\<C-a>"
+    let s:concat_pat = '%(%(\\n\\s*'.s:cml.'\\s*)@<=.|%(&>)@!)\&'
 
-    let s:pat ..= substitute(s:exception, '.*', s:CONCAT_PAT, '')
+    let s:pat ..= substitute(s:exception, '.*', s:concat_pat, '')
 endfor
 
-unlet! s:TO_IGNORE s:exception s:CML s:CONCAT_PAT
+unlet! s:TO_IGNORE s:exception s:cml s:concat_pat
 
 " don't capitalize a word followed or preceded by a dot
 let s:pat ..= '\.@<!\k+>\.@!&'
@@ -210,6 +210,7 @@ let s:pat ..= '\.@<!\k+>\.@!&'
 " Capture first letter, and the rest (separately).
 
 let s:pat ..= '<(\k)(\k{3,})>'
+lockvar s:pat
 
 " Garbage sentences to test the pattern:
 "
