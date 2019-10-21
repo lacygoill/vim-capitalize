@@ -156,7 +156,7 @@ const s:TO_IGNORE = {'articles': ['a', 'an', 'the'],
 let s:pat = '\v%(\k*\u\k*)@!&'
 
 " don't capitalize a word just after an apostrophe
-let s:pat ..= '''@<!&'
+let s:pat ..= '''@1<!&'
 
 " don't capitalize roman numerals
 let s:pat ..= '%([ivxlcdm]+>)@!&'
@@ -203,7 +203,7 @@ endfor
 unlet! s:TO_IGNORE s:exception s:cml s:concat_pat
 
 " don't capitalize a word followed or preceded by a dot
-let s:pat ..= '\.@<!\k+>\.@!&'
+let s:pat ..= '\.@1<!\k+>\.@!&'
 
 " FINAL concat of our regex, a word longer than 3 characters, without a dot
 " before or after.
