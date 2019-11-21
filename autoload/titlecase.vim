@@ -210,7 +210,7 @@ let s:pat ..= '\.@1<!\k+>\.@!&'
 " Capture first letter, and the rest (separately).
 
 let s:pat ..= '<(\k)(\k{3,})>'
-lockvar s:pat
+lockvar! s:pat
 
 " Garbage sentences to test the pattern:
 "
