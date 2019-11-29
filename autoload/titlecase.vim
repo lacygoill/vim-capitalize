@@ -23,7 +23,7 @@ fu titlecase#op(type) abort "{{{2
         let rep = '\u\1\L\2'
 
         if a:type is# 'line'
-            sil keepj keepp exe '''[,'']s/'.pat.'/'.rep.'/ge'
+            sil exe 'keepj keepp ''[,'']s/'.pat.'/'.rep.'/ge'
         else
             if a:type is# 'vis'
                 sil norm! gvy
