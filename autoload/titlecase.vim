@@ -14,7 +14,7 @@ fu titlecase#op(type) abort "{{{2
         set selection=inclusive
 
         " Replace the placeholder (C-a) with the current commentstring.
-        let pat = substitute(s:pat, "\<c-a>",
+        let pat = substitute(s:pat, "\x01",
             \ matchstr(&cms, '^\S\+\ze\s*%s').(empty(&cms) ? '' : '='), 'g')
 
         "             ┌ first letter of a word
@@ -194,7 +194,7 @@ for s:exception in s:TO_IGNORE.articles +
     " We must get `&commentstring` inside the function.
     " So, for the moment, we use `C-a` as a place holder.
 
-    let s:cml        = "\<C-a>"
+    let s:cml = "\x01"
     let s:concat_pat = '%(%(\\n\\s*'.s:cml.'\\s*)@<=.|%(&>)@!)\&'
 
     let s:pat ..= substitute(s:exception, '.*', s:concat_pat, '')
