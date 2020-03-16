@@ -205,7 +205,7 @@ fu titlecase#op(type) abort "{{{2
         endif
 
     catch
-        return lg#catch_error()
+        return lg#catch()
     finally
         let &cb  = cb_save
         let &sel = sel_save
