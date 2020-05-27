@@ -165,7 +165,12 @@ lockvar! s:pat
 "     over the quick brown fox jumps over the lazy dog
 
 " functions {{{1
-fu titlecase#op(type) abort "{{{2
+fu titlecase#op(...) abort "{{{2
+    if !a:0
+        let &opfunc = 'titlecase#op'
+        return 'g@'
+    endif
+    let type = a:1
     let cb_save  = &cb
     let sel_save = &selection
     let reg_save = ['"', getreg('"'), getregtype('"')]
@@ -183,24 +188,21 @@ fu titlecase#op(type) abort "{{{2
         "             │   │
         let rep = '\u\1\L\2'
 
-        if a:type is# 'line'
+        if type is# 'line'
             sil exe 'keepj keepp ''[,'']s/'..pat..'/'..rep..'/ge'
         else
-            if a:type is# 'vis'
-                sil norm! gvy
-                norm! gv
-            elseif a:type is# 'char'
+            if type is# 'char'
                 sil norm! `[v`]y
                 norm! `[v`]
-            elseif a:type is# 'line'
+            elseif type is# 'line'
                 sil norm! '[V']y
                 norm! '[V']
-            elseif a:type is# 'block'
+            elseif type is# 'block'
                 sil exe "norm! `[\<c-v>`]y"
                 exe "norm! `[\<c-v>`]"
             endif
             let new_text = substitute(@", pat, rep, 'g')
-            call setreg('"', new_text, a:type is# "\<c-v>" || a:type is# 'block' ? 'b' : '')
+            call setreg('"', new_text, type is# 'block' ? 'b' : '')
             norm! p
         endif
 
