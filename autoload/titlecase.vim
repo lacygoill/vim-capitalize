@@ -133,7 +133,7 @@ for s:exception in s:TO_IGNORE.articles
     " current buffer is `"`, we need:
     "
     "     \%(\%(\n\s*"\=\s*\)\@<=.\|\%(over\)\@!\)\&
-    "                ^^^^^^
+    "                ^----^
     "
     " The commentstring is given by:
     "
@@ -171,13 +171,11 @@ fu titlecase#op(...) abort "{{{2
         return 'g@'
     endif
     let type = a:1
-    let cb_save  = &cb
-    let sel_save = &selection
-    let reg_save = ['"', getreg('"'), getregtype('"')]
+    let [cb_save, sel_save] = [&cb, &sel]
+    let reg_save = getreginfo('"')
 
     try
-        set cb-=unnamed cb-=unnamedplus
-        set selection=inclusive
+        set cb-=unnamed cb-=unnamedplus sel=inclusive
 
         " Replace the placeholder (C-a) with the current commentstring.
         let pat = substitute(s:pat, "\x01",
@@ -192,26 +190,21 @@ fu titlecase#op(...) abort "{{{2
             sil exe 'keepj keepp ''[,'']s/'..pat..'/'..rep..'/ge'
         else
             if type is# 'char'
-                sil norm! `[v`]y
-                norm! `[v`]
-            elseif type is# 'line'
-                sil norm! '[V']y
-                norm! '[V']
+                sil norm! `[v`]ygv
             elseif type is# 'block'
-                sil exe "norm! `[\<c-v>`]y"
-                exe "norm! `[\<c-v>`]"
+                sil exe "norm! `[\<c-v>`]ygv"
             endif
-            let new_text = substitute(@", pat, rep, 'g')
-            call setreg('"', new_text, type is# 'block' ? 'b' : '')
+            let reg = getreg('"', 1, 1)
+            call map(reg, {_,v -> substitute(v, pat, rep, 'g')})
+            call setreg('"', reg, type[0])
             norm! p
         endif
 
     catch
         return lg#catch()
     finally
-        let &cb  = cb_save
-        let &sel = sel_save
-        call call('setreg', reg_save)
+        let [&cb, &sel] = [cb_save, sel_save]
+        call setreg('"', reg_save)
     endtry
 endfu
 
