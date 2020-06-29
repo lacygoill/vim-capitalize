@@ -175,7 +175,7 @@ fu titlecase#op(...) abort "{{{2
     let reg_save = getreginfo('"')
 
     try
-        set cb-=unnamed cb-=unnamedplus sel=inclusive
+        set cb= sel=inclusive
 
         " Replace the placeholder (C-a) with the current commentstring.
         let pat = substitute(s:pat, "\x01",
@@ -194,9 +194,11 @@ fu titlecase#op(...) abort "{{{2
             elseif type is# 'block'
                 sil exe "norm! `[\<c-v>`]ygv"
             endif
-            let reg = getreg('"', 1, 1)
-            call map(reg, {_,v -> substitute(v, pat, rep, 'g')})
-            call setreg('"', reg, type[0])
+            let reginfo = getreginfo('"')
+            let contents = get(reginfo, 'regcontents', [])
+            call map(contents, {_,v -> substitute(v, pat, rep, 'g')})
+            call extend(reginfo, {'regcontents': contents, 'regtype': type[0]})
+            call setreg('"', reginfo)
             norm! p
         endif
 
