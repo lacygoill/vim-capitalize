@@ -165,48 +165,31 @@ lockvar! s:pat
 "     over the quick brown fox jumps over the lazy dog
 
 " functions {{{1
-fu titlecase#op(...) abort "{{{2
-    if !a:0
-        let &opfunc = 'titlecase#op'
-        return 'g@'
+fu titlecase#op() abort "{{{2
+    let &opfunc = 'lg#opfunc'
+    let g:opfunc_core = 'titlecase#op_core'
+    return 'g@'
+endfu
+
+fu titlecase#op_core(type) abort
+    " Replace the placeholder (C-a) with the current commentstring.
+    let pat = substitute(s:pat, "\x01",
+        \ matchstr(&cms, '^\S\+\ze\s*%s')..(empty(&cms) ? '' : '='), 'g')
+
+    "             ┌ first letter of a word
+    "             │   ┌ rest of a word
+    "             │   │
+    let rep = '\u\1\L\2'
+
+    if a:type is# 'line'
+        sil exe 'keepj keepp ''[,'']s/'..pat..'/'..rep..'/ge'
+    else
+        let reginfo = getreginfo('"')
+        let contents = get(reginfo, 'regcontents', [])
+        call map(contents, {_,v -> substitute(v, pat, rep, 'g')})
+        call extend(reginfo, {'regcontents': contents, 'regtype': type[0]})
+        call setreg('"', reginfo)
+        norm! p
     endif
-    let type = a:1
-    let [cb_save, sel_save] = [&cb, &sel]
-    let reg_save = getreginfo('"')
-
-    try
-        set cb= sel=inclusive
-
-        " Replace the placeholder (C-a) with the current commentstring.
-        let pat = substitute(s:pat, "\x01",
-            \ matchstr(&cms, '^\S\+\ze\s*%s')..(empty(&cms) ? '' : '='), 'g')
-
-        "             ┌ first letter of a word
-        "             │   ┌ rest of a word
-        "             │   │
-        let rep = '\u\1\L\2'
-
-        if type is# 'line'
-            sil exe 'keepj keepp ''[,'']s/'..pat..'/'..rep..'/ge'
-        else
-            if type is# 'char'
-                sil norm! `[v`]ygv
-            elseif type is# 'block'
-                sil exe "norm! `[\<c-v>`]ygv"
-            endif
-            let reginfo = getreginfo('"')
-            let contents = get(reginfo, 'regcontents', [])
-            call map(contents, {_,v -> substitute(v, pat, rep, 'g')})
-            call extend(reginfo, {'regcontents': contents, 'regtype': type[0]})
-            call setreg('"', reginfo)
-            norm! p
-        endif
-
-    catch
-        return lg#catch()
-    finally
-        let [&cb, &sel] = [cb_save, sel_save]
-        call setreg('"', reg_save)
-    endtry
 endfu
 
