@@ -167,7 +167,9 @@ lockvar! s:pat
 " functions {{{1
 fu titlecase#op() abort "{{{2
     let &opfunc = 'lg#opfunc'
-    let g:opfunc_core = 'titlecase#op_core'
+    let g:opfunc = {
+        \ 'core': 'titlecase#op_core',
+        \ }
     return 'g@'
 endfu
 
