@@ -5,11 +5,13 @@ let g:autoloaded_titlecase = 1
 
 " Init {{{1
 
+import Opfunc from 'lg.vim' | const s:SID = execute('fu s:Opfunc')->matchstr('\C\<def\s\+\zs<SNR>\d\+_')
+
 " Goal:
 " build the pattern `s:pat` matching all the words we want to capitalize.
 
-" The following dictionary stores the articles/conjunctions/prepositions
-" which should not be capitalized. It misses some of them.
+" The following  dictionary stores the  articles/conjunctions/prepositions which
+" should not be capitalized.  It misses some of them.
 " For more info, see:
 "
 " https://en.wikipedia.org/wiki/List_of_English_prepositions#Single_words
@@ -22,7 +24,7 @@ let g:autoloaded_titlecase = 1
 "     as far as
 "
 " If one  day, we want  to exclude them,  we would have to  add an entry  in the
-" dictionary. They can't be mixed with single-word conjunctions.
+" dictionary.  They can't be mixed with single-word conjunctions.
 " Indeed, each conjunction will be used to produce a concat inside the
 " regex used to match the words to capitalize.
 " But the syntax for a concat which excludes a multi-part conjunction,
@@ -121,7 +123,7 @@ for s:exception in s:TO_IGNORE.articles
     "
     "     \%(over\)\@!\&
     "
-    " But, there's an exception. We *do* want to capitalize *any* word when it's
+    " But, there's an exception.  We *do* want to capitalize *any* word when it's
     " at the beginning of the line.
     " So, in fact, we need:
     "
@@ -129,7 +131,7 @@ for s:exception in s:TO_IGNORE.articles
     "
     " But, there's still another exception.
     " We  *do* want  to capitalize  *any* word  when it's  the first  word on  a
-    " commented  line. So,  in fact,  assuming  the  comment character  for  the
+    " commented  line.  So,  in fact,  assuming  the comment  character for  the
     " current buffer is `"`, we need:
     "
     "     \%(\%(\n\s*"\=\s*\)\@<=.\|\%(over\)\@!\)\&
@@ -144,7 +146,7 @@ for s:exception in s:TO_IGNORE.articles
     " So, for the moment, we use `C-a` as a place holder.
     "}}}
     let s:cml = "\x01"
-    let s:concat_pat = '\\%(\\%(\\n\\s*'..s:cml..'\\s*\\)\\@<=.\\|\\%(\0\\>\\)\\@!\\)\\\&'
+    let s:concat_pat = '\\%(\\%(\\n\\s*' .. s:cml .. '\\s*\\)\\@<=.\\|\\%(\0\\>\\)\\@!\\)\\\&'
     let s:pat ..= substitute(s:exception, '.*', s:concat_pat, '')
 endfor
 
@@ -166,7 +168,7 @@ lockvar! s:pat
 
 " functions {{{1
 fu titlecase#op() abort "{{{2
-    let &opfunc = 'lg#opfunc'
+    let &opfunc = s:SID .. 'Opfunc'
     let g:opfunc = {
         \ 'core': 'titlecase#op_core',
         \ }
@@ -176,7 +178,7 @@ endfu
 fu titlecase#op_core(type) abort
     " Replace the placeholder (C-a) with the current commentstring.
     let pat = substitute(s:pat, "\x01",
-        \ matchstr(&cms, '^\S\+\ze\s*%s')..(empty(&cms) ? '' : '='), 'g')
+        \ matchstr(&cms, '^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='), 'g')
 
     "             ┌ first letter of a word
     "             │   ┌ rest of a word
@@ -184,11 +186,11 @@ fu titlecase#op_core(type) abort
     let rep = '\u\1\L\2'
 
     if a:type is# 'line'
-        sil exe 'keepj keepp ''[,'']s/'..pat..'/'..rep..'/ge'
+        sil exe 'keepj keepp ''[,'']s/' .. pat .. '/' .. rep .. '/ge'
     else
         let reginfo = getreginfo('"')
         let contents = get(reginfo, 'regcontents', [])
-        call map(contents, {_,v -> substitute(v, pat, rep, 'g')})
+        call map(contents, {_, v -> substitute(v, pat, rep, 'g')})
         call extend(reginfo, {'regcontents': contents, 'regtype': type[0]})
         call setreg('"', reginfo)
         norm! p
