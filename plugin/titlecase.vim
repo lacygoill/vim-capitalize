@@ -1,7 +1,7 @@
-if exists('g:loaded_titlecase')
-    finish
-endif
-let g:loaded_titlecase = 1
+vim9 noclear
+
+if exists('loaded') | finish | endif
+var loaded = true
 
 nno <expr><unique> +<c-t>      titlecase#op()
 nno <expr><unique> +<c-t><c-t> titlecase#op() .. '_'
