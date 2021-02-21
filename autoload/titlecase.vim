@@ -6,7 +6,7 @@ var loaded = true
 # Init {{{1
 
 import Opfunc from 'lg.vim'
-const SID = execute('fu Opfunc')->matchstr('\C\<def\s\+\zs<SNR>\d\+_')
+const SID: string = execute('fu Opfunc')->matchstr('\C\<def\s\+\zs<SNR>\d\+_')
 
 # Goal:
 # build the pattern `spat` matching all the words we want to capitalize.
@@ -141,8 +141,8 @@ spat ..= '\%([ivxlcdm]\+\>\)\@!\&'
 # We must get `&commentstring` inside the function.
 # So, for the moment, we use `C-a` as a place holder.
 #}}}
-var cml = "\x01"
-var concat_pat = '\\%(\\%(\\n\\s*' .. cml .. '\\s*\\)\\@<=.\\|\\%(\0\\>\\)\\@!\\)\\\&'
+var cml: string = "\x01"
+var concat_pat: string = '\\%(\\%(\\n\\s*' .. cml .. '\\s*\\)\\@<=.\\|\\%(\0\\>\\)\\@!\\)\\\&'
 for exception in TO_IGNORE.articles
                + TO_IGNORE.conjunctions
                + TO_IGNORE.prepositions
@@ -186,7 +186,7 @@ def titlecase#op_core(type: string)
     else
         var reginfo: dict<any> = getreginfo('"')
         var contents: list<string> = get(reginfo, 'regcontents', [])
-        map(contents, (_, v) => substitute(v, pat, rep, 'g'))
+            ->map((_, v: string): string => substitute(v, pat, rep, 'g'))
         extend(reginfo, {regcontents: contents, regtype: type[0]})
         setreg('"', reginfo)
         norm! p
