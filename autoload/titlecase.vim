@@ -167,11 +167,11 @@ lockvar! spat
 # functions {{{1
 def titlecase#op(): string #{{{2
     &opfunc = SID .. 'Opfunc'
-    g:opfunc = {core: 'titlecase#op_core'}
+    g:opfunc = {core: 'titlecase#opCore'}
     return 'g@'
 enddef
 
-def titlecase#op_core(type: string)
+def titlecase#opCore(type: string)
     # Replace the placeholder (C-a) with the current commentstring.
     var pat: string = substitute(spat, "\x01",
         matchstr(&cms, '^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='), 'g')
