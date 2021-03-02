@@ -147,7 +147,7 @@ for exception in TO_IGNORE.articles
                + TO_IGNORE.conjunctions
                + TO_IGNORE.prepositions
 
-    spat ..= substitute(exception, '.*', concat_pat, '')
+    spat ..= exception->substitute('.*', concat_pat, '')
 endfor
 
 # don't capitalize a word followed or preceded by a dot
@@ -173,8 +173,12 @@ enddef
 
 def titlecase#opCore(type: string)
     # Replace the placeholder (C-a) with the current commentstring.
-    var pat: string = substitute(spat, "\x01",
-        matchstr(&cms, '^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='), 'g')
+    var pat: string = spat
+        ->substitute(
+            '\%x01',
+            matchstr(&cms, '^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='),
+            'g'
+        )
 
     #                     ┌ first letter of a word
     #                     │   ┌ rest of a word
@@ -186,7 +190,7 @@ def titlecase#opCore(type: string)
     else
         var reginfo: dict<any> = getreginfo('"')
         var contents: list<string> = get(reginfo, 'regcontents', [])
-            ->map((_, v: string): string => substitute(v, pat, rep, 'g'))
+            ->map((_, v: string): string => v->substitute(pat, rep, 'g'))
         extend(reginfo, {regcontents: contents, regtype: type[0]})
         setreg('"', reginfo)
         norm! p
