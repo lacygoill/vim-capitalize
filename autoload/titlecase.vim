@@ -135,7 +135,7 @@ spat ..= '\%([ivxlcdm]\+\>\)\@!\&'
 #
 # The commentstring is given by:
 #
-#     matchstr(&commentstring, '^\S\+\ze\s*%s')
+#     &commentstring->matchstr('^\S\+\ze\s*%s')
 #
 # But we don't use it now, because we're outside the function.
 # We must get `&commentstring` inside the function.
@@ -164,19 +164,20 @@ lockvar! spat
 #     hello world foo baZbaz xvi function.calls 'norf either
 #     over the quick brown fox jumps over the lazy dog
 
-# functions {{{1
+# Interface {{{1
 def titlecase#op(): string #{{{2
     &opfunc = SID .. 'Opfunc'
-    g:opfunc = {core: 'titlecase#opCore'}
+    g:opfunc = {core: Titlecase}
     return 'g@'
 enddef
-
-def titlecase#opCore(type: string)
+#}}}1
+# Core {{{1
+def Titlecase(type: string) #{{{2
     # Replace the placeholder (C-a) with the current commentstring.
     var pat: string = spat
         ->substitute(
             '\%x01',
-            matchstr(&cms, '^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='),
+            &cms->matchstr('^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='),
             'g'
         )
 
@@ -186,7 +187,7 @@ def titlecase#opCore(type: string)
     var rep: string = '\u\1\L\2'
 
     if type == 'line'
-        sil exe 'keepj keepp :''[,'']s/' .. pat .. '/' .. rep .. '/ge'
+        exe 'sil keepj keepp :''[,'']s/' .. pat .. '/' .. rep .. '/ge'
     else
         var reginfo: dict<any> = getreginfo('"')
         var contents: list<string> = get(reginfo, 'regcontents', [])
