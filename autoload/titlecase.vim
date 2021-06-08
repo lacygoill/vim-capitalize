@@ -166,8 +166,8 @@ lockvar! spat
 
 # Interface {{{1
 def titlecase#op(): string #{{{2
-    &opfunc = SID .. 'Opfunc'
-    g:opfunc = {core: Titlecase}
+    &operatorfunc = SID .. 'Opfunc'
+    g:operatorfunc = {core: Titlecase}
     return 'g@'
 enddef
 #}}}1
@@ -177,7 +177,7 @@ def Titlecase(type: string) #{{{2
     var pat: string = spat
         ->substitute(
             '\%x01',
-            &cms->matchstr('^\S\+\ze\s*%s') .. (empty(&cms) ? '' : '='),
+            &commentstring->matchstr('^\S\+\ze\s*%s') .. (empty(&commentstring) ? '' : '='),
             'g'
         )
 
