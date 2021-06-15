@@ -187,7 +187,7 @@ def Titlecase(type: string) #{{{2
     var rep: string = '\u\1\L\2'
 
     if type == 'line'
-        exe 'sil keepj keepp :''[,'']s/' .. pat .. '/' .. rep .. '/ge'
+        exe 'sil keepj keepp :''[,''] s/' .. pat .. '/' .. rep .. '/ge'
     else
         var reginfo: dict<any> = getreginfo('"')
         var contents: list<string> = get(reginfo, 'regcontents', [])
