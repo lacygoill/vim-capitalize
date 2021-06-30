@@ -6,7 +6,7 @@ var loaded = true
 # Init {{{1
 
 import Opfunc from 'lg.vim'
-const SID: string = execute('fu Opfunc')->matchstr('\C\<def\s\+\zs<SNR>\d\+_')
+const SID: string = execute('function Opfunc')->matchstr('\C\<def\s\+\zs<SNR>\d\+_')
 
 # Goal:
 # build the pattern `spat` matching all the words we want to capitalize.
@@ -187,14 +187,16 @@ def Titlecase(type: string) #{{{2
     var rep: string = '\u\1\L\2'
 
     if type == 'line'
-        exe 'sil keepj keepp :''[,''] s/' .. pat .. '/' .. rep .. '/ge'
+        execute 'silent keepjumps keeppatterns '
+            .. ":'[,'] "
+            .. 'substitute/' .. pat .. '/' .. rep .. '/ge'
     else
         var reginfo: dict<any> = getreginfo('"')
         var contents: list<string> = get(reginfo, 'regcontents', [])
             ->map((_, v: string): string => v->substitute(pat, rep, 'g'))
         extend(reginfo, {regcontents: contents, regtype: type[0]})
         setreg('"', reginfo)
-        norm! p
+        normal! p
     endif
 enddef
 
