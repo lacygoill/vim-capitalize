@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # Init {{{1
 
 import Opfunc from 'lg.vim'
@@ -193,7 +190,7 @@ def Titlecase(type: string) #{{{2
     else
         var reginfo: dict<any> = getreginfo('"')
         var contents: list<string> = get(reginfo, 'regcontents', [])
-            ->map((_, v: string): string => v->substitute(pat, rep, 'g'))
+            ->map((_, v: string) => v->substitute(pat, rep, 'g'))
         extend(reginfo, {regcontents: contents, regtype: type[0]})
         setreg('"', reginfo)
         normal! p
