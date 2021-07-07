@@ -140,7 +140,7 @@ spat ..= '\%([ivxlcdm]\+\>\)\@!\&'
 #}}}
 var cml: string = "\x01"
 var concat_pat: string = '\\%(\\%(\\n\\s*' .. cml .. '\\s*\\)\\@<=.\\|\\%(\0\\>\\)\\@!\\)\\\&'
-for exception in TO_IGNORE.articles
+for exception: string in TO_IGNORE.articles
                + TO_IGNORE.conjunctions
                + TO_IGNORE.prepositions
 
